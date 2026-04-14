@@ -1,0 +1,633 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2426577034535652093
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5660369607063805047}
+  m_Layer: 0
+  m_Name: IronStone1x8
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5660369607063805047
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2426577034535652093}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4139780310128022019}
+  - {fileID: 1981443237493849307}
+  - {fileID: 8101494092011698827}
+  - {fileID: 7829454104489204246}
+  - {fileID: 1339832185479501703}
+  - {fileID: 8889956261833372018}
+  - {fileID: 2754168604181251988}
+  - {fileID: 6640700442707363827}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &439156239594629482
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone (7)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &6640700442707363827 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 439156239594629482}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2409368101815803883
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone (5)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &8889956261833372018 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 2409368101815803883}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3053152954451055634
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &8101494092011698827 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 3053152954451055634}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3933749813651747983
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone (3)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &7829454104489204246 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 3933749813651747983}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4706037017499046466
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &1981443237493849307 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 4706037017499046466}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5235638928552311070
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone (4)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &1339832185479501703 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 5235638928552311070}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7152780371235667098
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &4139780310128022019 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 7152780371235667098}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8937523595231684877
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5660369607063805047}
+    m_Modifications:
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8062041370014295179, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+        type: 3}
+      propertyPath: m_Name
+      value: IronStone (6)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5ec30aead90b8ef4893d4fe0d62daeea, type: 3}
+--- !u!4 &2754168604181251988 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6498891742991167129, guid: 5ec30aead90b8ef4893d4fe0d62daeea,
+    type: 3}
+  m_PrefabInstance: {fileID: 8937523595231684877}
+  m_PrefabAsset: {fileID: 0}
