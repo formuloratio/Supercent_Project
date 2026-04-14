@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2085009799853846513}
   m_Layer: 0
-  m_Name: Floor_Tile1x4
+  m_Name: StoneArea_Floor_Tile1x4
   m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

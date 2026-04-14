@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5660369607063805047}
   m_Layer: 0
-  m_Name: IronStone1x8
+  m_Name: StoneArea_IronStone1x8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
