@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     public enum PlayerState { Idle, Move, Mining }
     public PlayerState currentState;
+    private Transform camTransform; // 카메라 위치 정보 저장용
 
     [Header("Movement")]
     public FloatingJoystick joystick;
@@ -29,13 +30,40 @@ public class PlayerController : MonoBehaviour
         CheckMining();
     }
 
+    private void Start()
+    {
+        // 매 프레임 Camera.main을 호출하는 것은 성능에 좋지 않으므로 미리 캐싱합니다.
+        if (Camera.main != null)
+            camTransform = Camera.main.transform;
+    }
+
     private void HandleMovement()
     {
-        Vector3 direction = Vector3.forward * joystick.Vertical + Vector3.right * joystick.Horizontal;
+        if (camTransform == null || joystick == null) return;
+
+        // 1. 카메라가 바라보는 방향(앞, 우측)을 가져옵니다.
+        Vector3 forward = camTransform.forward;
+        Vector3 right = camTransform.right;
+
+        // 2. 캐릭터가 하늘로 날아오르거나 땅에 박히지 않게 Y축(높이)을 0으로 만듭니다.
+        forward.y = 0f;
+        right.y = 0f;
+
+        // 3. 방향 데이터만 남기도록 정규화(Normalize) 합니다.
+        forward.Normalize();
+        right.Normalize();
+
+        // 4. 카메라 기준 '앞'에 조이스틱 수직 입력을, '우측'에 수평 입력을 곱합니다.
+        Vector3 direction = (forward * joystick.Vertical) + (right * joystick.Horizontal);
+
         if (direction.magnitude > 0.1f)
         {
+            // 이동: 등속도 이동을 위해 deltaTime을 곱합니다.
             transform.position += direction * moveSpeed * Time.deltaTime;
+
+            // 회전: 이동하려는 방향을 부드럽게 바라보게 합니다.
             transform.forward = direction;
+
             currentState = PlayerState.Move;
         }
         else
