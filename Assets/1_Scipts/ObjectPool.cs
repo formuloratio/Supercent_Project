@@ -1,39 +1,45 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.Generic;
 
-// 이벤트를 관리하는 정적 클래스
-public static class GameEvents
-{
-    public static Action OnWorkerMined; // 인부가 채굴했을 때 발생
-}
-
-// 오브젝트 풀링 (싱글톤)
 public class ObjectPool : MonoBehaviour
 {
-    public static ObjectPool Instance;
+    public static ObjectPool Instance { get; private set; }
+
     private Dictionary<string, Queue<GameObject>> poolDict = new Dictionary<string, Queue<GameObject>>();
 
-    private void Awake() { Instance = this; }
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
-    public GameObject Pop(GameObject prefab)
+    public GameObject Pop(GameObject prefab, Vector3 position, Quaternion rotation)
     {
         string key = prefab.name;
         if (!poolDict.ContainsKey(key)) poolDict[key] = new Queue<GameObject>();
 
+        GameObject obj;
         if (poolDict[key].Count > 0)
         {
-            GameObject obj = poolDict[key].Dequeue();
-            obj.SetActive(true);
-            return obj;
+            obj = poolDict[key].Dequeue();
         }
-        return Instantiate(prefab);
+        else
+        {
+            obj = Instantiate(prefab);
+            obj.name = prefab.name; // "(Clone)" 제거
+        }
+
+        obj.transform.position = position;
+        obj.transform.rotation = rotation;
+        obj.SetActive(true);
+        return obj;
     }
 
     public void Push(GameObject obj)
     {
-        string key = obj.name.Replace("(Clone)", "");
+        string key = obj.name;
         obj.SetActive(false);
+        obj.transform.SetParent(transform); // 씬 정리용
         if (!poolDict.ContainsKey(key)) poolDict[key] = new Queue<GameObject>();
         poolDict[key].Enqueue(obj);
     }
