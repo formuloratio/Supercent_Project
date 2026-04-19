@@ -8,6 +8,9 @@ public class PlayerInteraction : MonoBehaviour
     public PlayerStackHandler playerStack;
     public GameObject orePrefab; // 임시 채굴용 프리팹 (보통 돌에서 생성)
 
+    [Header("UI Feedback")]
+    public GameObject maxTextPrefab; // "MAX"라고 적힌 팝업 UI 혹은 프리팹
+
     public EquipmentDataSO currentEqData;
 
     private float lastMineTime;
@@ -15,7 +18,6 @@ public class PlayerInteraction : MonoBehaviour
     private bool isMining = false; // 채굴 상태
 
     // 문자열 대신 해시값을 사용하여 성능 최적화
-    private readonly int isMovingHash = Animator.StringToHash("isMoving");
     private readonly int doMiningHash = Animator.StringToHash("doMining");
 
     public void UpdateEquipmentData(EquipmentDataSO data)
@@ -53,7 +55,7 @@ public class PlayerInteraction : MonoBehaviour
     private void PerformMining()
     {
         // [수정] 전체 개수가 아니라 "철광석" 자리가 있는지 확인합니다.
-        if (!playerStack.CanAdd(ResourceType.IronOre)) return;
+        //if (!playerStack.CanAdd(ResourceType.IronOre)) return;
 
         isMining = true;
         lastMineTime = Time.time;
@@ -65,21 +67,39 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (currentTargetRock != null && currentTargetRock.IsActive)
         {
-            // [수정] 채굴 전 가방에 자리가 있는지 확인 (타입 지정)
-            if (!playerStack.CanAdd(ResourceType.IronOre)) return;
+            // [핵심] 여기서 가방이 꽉 찼는지 확인합니다.
+            if (!playerStack.CanAdd(ResourceType.IronOre))
+            {
+                // 가방이 꽉 찼을 때: MAX 표시만 띄움
+                ShowMaxFeedback(((Component)currentTargetRock).transform.position + Vector3.up * 2f);
+                return;
+            }
 
-            // 여기서 실제로 체력을 깎고 파편을 생성합니다.
-            // 이펙트 및 데미지 전달
+            // 가방에 자리가 있을 때만: 실제 채굴 로직 실행
             currentTargetRock.TakeDamage(currentEqData.mineDamage, ((Component)currentTargetRock).transform.position);
-            // 채굴 성공 시 광물 파편 생성 후 등 뒤로 날아감
+
             GameObject oreObj = ObjectPool.Instance.Pop(orePrefab, ((Component)currentTargetRock).transform.position, Quaternion.identity);
             ResourceItem item = oreObj.GetComponent<ResourceItem>();
 
-            // 혹시 ResourceItem을 안 붙였을 때를 대비한 안전장치(Null 체크)
             if (item != null)
             {
                 playerStack.AddToStack(item, currentEqData.maxCapacity);
             }
+        }
+    }
+
+    private void ShowMaxFeedback(Vector3 position)
+    {
+        // 방법 1: 간단하게 로그만 찍거나
+        // Debug.Log("가방이 가득 찼습니다!");
+
+        // 방법 2: MAX 프리팹을 띄우는 로직 (추천)
+        if (maxTextPrefab != null)
+        {
+            // ObjectPool을 사용하여 MAX 표시 오브젝트를 팝업
+            ObjectPool.Instance.Pop(maxTextPrefab, position, Quaternion.identity);
+
+            // 일정 시간 후 다시 풀에 넣는 로직이 포함된 스크립트가 maxPop에 있으면 좋습니다.
         }
     }
 

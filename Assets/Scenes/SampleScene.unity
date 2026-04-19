@@ -29779,6 +29779,12 @@ PrefabInstance:
       propertyPath: playerStack
       value: 
       objectReference: {fileID: 4141488278102135932}
+    - target: {fileID: 8394728873098261137, guid: de75e86a34414ae4587166b117dcb264,
+        type: 3}
+      propertyPath: maxTextPrefab
+      value: 
+      objectReference: {fileID: 3341287065040799569, guid: fef710b3eb3ea4245b3a7bf000b17f8c,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
