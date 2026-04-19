@@ -6,25 +6,32 @@ public class MachineZone : MonoBehaviour, IInteractable
     public enum ZoneType { In, Out }
     public ZoneType zoneType;
 
-    private ConverterMachine machine;
+    // 두 가지 기계 타입을 모두 담을 수 있도록 변수 선언
+    private ConverterMachine converterMachine;
+    private BookingDesk bookingDesk;
 
     private void Start()
     {
-        // 부모 오브젝트에서 '진짜 기계' 스크립트를 찾아옵니다.
-        machine = GetComponentInParent<ConverterMachine>();
+        // 부모 오브젝트에서 두 스크립트 중 하나를 찾아옵니다.
+        converterMachine = GetComponentInParent<ConverterMachine>();
+        bookingDesk = GetComponentInParent<BookingDesk>();
 
-        if (machine == null)
-            Debug.LogError($"{gameObject.name}의 부모에게 ConverterMachine이 없습니다!");
+        if (converterMachine == null && bookingDesk == null)
+            Debug.LogError($"{gameObject.name}의 부모에게 ConverterMachine이나 BookingDesk가 없습니다!");
     }
 
     public void Interact(PlayerInteraction player)
     {
-        if (machine == null) return;
-
-        // 구역 타입에 따라 부모 기계의 특정 함수만 호출
+        // 구역 타입과 연결된 기계에 따라 알맞은 함수 호출
         if (zoneType == ZoneType.In)
-            machine.Deposit(player);
+        {
+            if (converterMachine != null) converterMachine.Deposit(player);
+            else if (bookingDesk != null) bookingDesk.Deposit(player);
+        }
         else
-            machine.Collect(player);
+        {
+            if (converterMachine != null) converterMachine.Collect(player);
+            else if (bookingDesk != null) bookingDesk.Collect(player);
+        }
     }
 }

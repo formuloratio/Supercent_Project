@@ -6,25 +6,33 @@ using static GameEnums;
 public class BookingDesk : MonoBehaviour
 {
     [Header("Stacks")]
-    public MachineStackHandler inputStack;  // 수갑이 놓일 곳 (In_Zone)
-    public MachineStackHandler outputStack; // 돈이 생성될 곳 (Out_Zone)
-    public GameObject cashPrefab;           // 생성될 돈 프리팹
+    public MachineStackHandler inputStack;
+    public MachineStackHandler outputStack;
+    public GameObject cashPrefab;
 
     [Header("Queue System")]
-    public Transform queueStartPoint;       // 심사대 바로 앞 (처리 받는 위치)
-    public Transform[] queuePoints;         // 대기줄 위치들
-    public Transform jailEntrancePoint;     // 죄수가 향할 감옥 목적지
+    public Transform queueStartPoint;
+    public Transform[] queuePoints;
+    public Transform jailEntrancePoint;
+    public Transform spawnPoint;
 
-    [Header("Spawn Settings")]
-    public GameObject npcPrefab;            // NPC 기본 껍데기 프리팹
-    public CriminalDataSO[] spawnableCriminals; // 스폰 가능한 SO 리스트
+    [Header("Settings")]
+    public GameObject npcPrefab;
     public float spawnInterval = 3f;
+    public CriminalDataSO criminalData;
+
+    [Header("Door Object")]
+    public GameObject jailDoor; // 감옥 문 오브젝트 연결
+    private int travelingPrisonersCount = 0; // 현재 감옥으로 걸어가고 있는 죄수 수
 
     private List<CriminalNPC> waitingQueue = new List<CriminalNPC>();
     private CriminalNPC currentProcessingNPC;
 
     private bool isProcessing = false;
     private float spawnTimer;
+
+    private float lastCollectTime;
+    private bool isTransferring = false;
 
     private void Update()
     {
@@ -45,43 +53,35 @@ public class BookingDesk : MonoBehaviour
 
     private void SpawnNPC()
     {
-        // 랜덤한 SO 데이터 선택
-        CriminalDataSO randomData = spawnableCriminals[Random.Range(0, spawnableCriminals.Length)];
+        if (spawnPoint == null || npcPrefab == null) return;
 
-        // NPC 생성 (화면 밖이나 특정 스폰 포인트에서)
-        GameObject npcObj = ObjectPool.Instance.Pop(npcPrefab, queuePoints[queuePoints.Length - 1].position, Quaternion.identity);
+        GameObject npcObj = ObjectPool.Instance.Pop(npcPrefab, spawnPoint.position, spawnPoint.rotation);
         CriminalNPC npc = npcObj.GetComponent<CriminalNPC>();
 
-        npc.Initialize(randomData);
         waitingQueue.Add(npc);
     }
 
     private void ProcessQueue()
     {
-        // 현재 심사 중인 사람이 없고, 대기열에 사람이 있다면
         if (currentProcessingNPC == null && waitingQueue.Count > 0)
         {
             currentProcessingNPC = waitingQueue[0];
             waitingQueue.RemoveAt(0);
-            currentProcessingNPC.MoveToTarget(queueStartPoint.position);
+            currentProcessingNPC.MoveToTarget(queueStartPoint);
         }
 
-        // 나머지 대기열 사람들 앞으로 한 칸씩 이동
         for (int i = 0; i < waitingQueue.Count; i++)
         {
-            waitingQueue[i].MoveToTarget(queuePoints[i].position);
+            waitingQueue[i].MoveToTarget(queuePoints[i]);
         }
     }
 
     private void CheckAndProcessCriminal()
     {
-        if (isProcessing || currentProcessingNPC == null) return;
-
-        // 심사대에 NPC가 도착했는지 확인
+        if (isProcessing || currentProcessingNPC == null || criminalData == null) return;
         if (Vector3.Distance(currentProcessingNPC.transform.position, queueStartPoint.position) > 0.5f) return;
 
-        // 아웃 스택에 자리가 있고, 인 스택에 요구하는 수갑 개수만큼 있는지 확인
-        if (outputStack.Count < 100 && inputStack.Count >= currentProcessingNPC.currentData.requiredHandcuffs)
+        if (outputStack.Count < 100 && inputStack.Count >= criminalData.requiredHandcuffs)
         {
             StartCoroutine(ConvertRoutine());
         }
@@ -90,44 +90,119 @@ public class BookingDesk : MonoBehaviour
     private IEnumerator ConvertRoutine()
     {
         isProcessing = true;
-        int required = currentProcessingNPC.currentData.requiredHandcuffs;
 
-        // 1. 수갑을 NPC에게 날려보냄
+        int required = criminalData.requiredHandcuffs;
         for (int i = 0; i < required; i++)
         {
             ResourceItem handcuff = inputStack.RemoveFromStack();
             if (handcuff != null)
             {
-                // NPC의 가슴 높이쯤으로 점프 (로컬 Y: 1.5f 정도)
                 handcuff.JumpTo(currentProcessingNPC.transform, Vector3.up * 1.5f, 0.3f, () =>
                 {
                     ObjectPool.Instance.Push(handcuff.gameObject);
                 });
-                yield return new WaitForSeconds(0.1f); // 연속으로 날아가는 연출 간격
+                yield return new WaitForSeconds(0.1f);
             }
         }
 
-        // 수갑이 다 날아갈 때까지 잠깐 대기
         yield return new WaitForSeconds(0.3f);
 
-        // 2. NPC를 죄수로 변환 (옷 갈아입기)
         currentProcessingNPC.ChangeToPrisoner();
 
-        // 3. 돈(Cash) 생성해서 Output 존에 쌓기
-        int reward = currentProcessingNPC.currentData.rewardCash;
+        int reward = criminalData.rewardCash;
         for (int i = 0; i < reward; i++)
         {
             GameObject cashObj = ObjectPool.Instance.Pop(cashPrefab, currentProcessingNPC.transform.position + Vector3.up, Quaternion.identity);
             ResourceItem cashItem = cashObj.GetComponent<ResourceItem>();
             outputStack.AddToStack(cashItem, 100);
-            yield return new WaitForSeconds(0.05f); // 돈이 타다닥 쌓이는 연출
+            yield return new WaitForSeconds(0.05f);
         }
 
-        // 4. 죄수를 감옥으로 쫓아냄
-        currentProcessingNPC.GoToJail(jailEntrancePoint.position);
+        // 1. 이동 중인 죄수 카운트 증가 및 문 열기(비활성화)
+        travelingPrisonersCount++;
+        if (jailDoor != null) jailDoor.SetActive(false);
 
-        // 5. 다음 사람 받을 준비
+        Vector3 randomOffset = new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f));
+
+        // 2. GoToJail 실행 시 도착 시 실행할 함수(콜백)를 넘겨줌
+        StartCoroutine(currentProcessingNPC.GoToJail(jailEntrancePoint.position + randomOffset, () =>
+        {
+            // 도착 시 실행될 내용
+            travelingPrisonersCount--;
+
+            // 3. 더 이상 이동 중인 죄수가 없으면 문 닫기(활성화)
+            if (travelingPrisonersCount <= 0)
+            {
+                travelingPrisonersCount = 0; // 음수 방지 안전장치
+                if (jailDoor != null) jailDoor.SetActive(true);
+            }
+        }));
+
+        // 3. 죄수가 감옥으로 출발했으므로, 약간의 텀(0.5초)을 두고 다음 사람을 부릅니다.
+        yield return new WaitForSeconds(0.5f);
+
+        // 4. 상태를 초기화하여 다음 NPC가 queueStartPoint로 올 수 있게 합니다.
         currentProcessingNPC = null;
         isProcessing = false;
+    }
+
+    // --- 상호작용 함수 ---
+    public void Deposit(PlayerInteraction player)
+    {
+        if (isTransferring) return;
+        StartCoroutine(DepositRoutine(player));
+    }
+
+    private IEnumerator DepositRoutine(PlayerInteraction player)
+    {
+        isTransferring = true;
+        while (player.playerStack.HasResourceType(ResourceType.Handcuff))
+        {
+            ResourceItem item = player.playerStack.RemoveSpecificType(ResourceType.Handcuff);
+            if (item != null)
+            {
+                inputStack.AddToStack(item, 100);
+                yield return new WaitForSeconds(0.05f);
+            }
+            else break;
+        }
+        isTransferring = false;
+    }
+
+    public void Collect(PlayerInteraction player)
+    {
+        if (Time.time - lastCollectTime < 0.05f) return;
+
+        if (outputStack.Count > 0)
+        {
+            lastCollectTime = Time.time;
+            ResourceItem item = outputStack.RemoveFromStack();
+
+            if (item != null)
+            {
+                if (item.type == ResourceType.Cash)
+                {
+                    if (player.playerStack.CanAdd(ResourceType.Cash))
+                    {
+                        player.playerStack.AddToStack(item, 0);
+                    }
+                    else
+                    {
+                        item.JumpTo(player.transform, Vector3.up * 2f, 0.2f, () => {
+                            GameManager.Instance.AddMoney(10);
+                            ObjectPool.Instance.Push(item.gameObject);
+                        });
+                    }
+                }
+                else if (player.playerStack.CanAdd(item.type))
+                {
+                    player.playerStack.AddToStack(item, 0);
+                }
+                else
+                {
+                    outputStack.AddToStack(item, 100);
+                }
+            }
+        }
     }
 }
