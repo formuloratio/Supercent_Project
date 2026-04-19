@@ -10,6 +10,7 @@ public class Interfaces : MonoBehaviour
     public interface IMineable
     {
         bool IsActive { get; }
-        void TakeDamage(int damage, UnityEngine.Vector3 hitPoint);
+        // 바위가 파괴되면 true, 아니면 false를 반환하도록 수정
+        bool TakeDamage(int damage, Vector3 hitPoint);
     }
 }

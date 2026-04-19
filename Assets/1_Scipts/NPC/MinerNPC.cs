@@ -1,9 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using static GameEnums;
 using static Interfaces;
 
 public class MinerNPC : MonoBehaviour
 {
+    [Header("Mining Settings")]
+    public GameObject orePrefab;             // 생성할 광석 프리팹
+    public MachineStackHandler targetMachineInput; // 광석이 날아갈 기계 (UpgradeZone에서 할당)
+    public int mineDamage = 34;
+
     private NavMeshAgent agent;
     private Animator anim;
     private IMineable targetRock;
@@ -17,7 +23,7 @@ public class MinerNPC : MonoBehaviour
 
     private void Update()
     {
-        if (isMining) return;
+        if (anim == null || isMining) return;
 
         if (targetRock == null || !targetRock.IsActive)
         {
@@ -26,7 +32,7 @@ public class MinerNPC : MonoBehaviour
         else
         {
             float dist = Vector3.Distance(transform.position, ((Component)targetRock).transform.position);
-            if (dist <= agent.stoppingDistance)
+            if (dist <= agent.stoppingDistance + 0.5f)
             {
                 StartMining();
             }
@@ -56,8 +62,11 @@ public class MinerNPC : MonoBehaviour
         if (closestRock != null)
         {
             targetRock = closestRock.GetComponent<IMineable>();
-            agent.SetDestination(closestRock.transform.position);
-            anim.SetBool("isMoving", true);
+            if (agent.isOnNavMesh)
+            {
+                agent.SetDestination(closestRock.transform.position);
+                anim.SetBool("isMoving", true);
+            }
         }
     }
 
@@ -67,21 +76,49 @@ public class MinerNPC : MonoBehaviour
         agent.isStopped = true;
         anim.SetBool("isMoving", false);
         anim.SetTrigger("doMining");
+
+        if (targetRock != null)
+            transform.LookAt(((Component)targetRock).transform.position);
     }
 
-    // 플레이어와 같은 애니메이션 이벤트 호출
+    // --- 애니메이션 이벤트: 채굴 타격 시 호출 ---
     public void OnMiningImpact()
     {
         if (targetRock != null && targetRock.IsActive)
         {
-            // 작업자는 데미지만 입히고 아이템은 생성하지 않거나, 별도 처리
-            targetRock.TakeDamage(10, ((Component)targetRock).transform.position);
+            // [사운드 추가] 타격 대상인 바위의 AudioSource를 가져와서 재생
+            AudioSource rockSource = ((Component)targetRock).GetComponent<AudioSource>();
+            if (rockSource != null)
+            {
+                // 광부 NPC는 곡괭이 소리(miningClip)를 냅니다.
+                AudioManager.Instance.Play3DSFX(rockSource, AudioManager.Instance.miningClip, AudioManager.Instance.miningVolume);
+            }
+
+            // 타격 후 파괴 여부 확인
+            bool isBroken = targetRock.TakeDamage(mineDamage, ((Component)targetRock).transform.position);
+
+            if (isBroken)
+            {
+                if (orePrefab != null && targetMachineInput != null)
+                {
+                    GameObject oreObj = ObjectPool.Instance.Pop(orePrefab, ((Component)targetRock).transform.position, Quaternion.identity);
+                    ResourceItem item = oreObj.GetComponent<ResourceItem>();
+
+                    if (item != null)
+                    {
+                        item.JumpTo(targetMachineInput.transform, Vector3.zero, 0.5f, () =>
+                        {
+                            targetMachineInput.AddToStack(item, 100);
+                        });
+                    }
+                }
+            }
         }
     }
 
     public void FinishMining()
     {
         isMining = false;
-        agent.isStopped = false;
+        if (agent.isOnNavMesh) agent.isStopped = false;
     }
 }

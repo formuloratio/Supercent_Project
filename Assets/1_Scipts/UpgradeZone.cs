@@ -1,69 +1,80 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.AI;
+using System;
 using static GameEnums;
-using static Interfaces; // IInteractable이 정의된 네임스페이스 (필요시 확인)
+using static Interfaces;
 
-public enum UpgradeType { Equipment, MinerNPC, TransporterNPC }
-
-// [핵심] IInteractable을 반드시 상속받아야 Player가 인식합니다!
 public class UpgradeZone : MonoBehaviour, IInteractable
 {
+    public enum UpgradeType { Equipment, MinerNPC, TransporterNPC }
+    public Action<UpgradeZone> OnZoneCompleted;
+
+    [Header("Upgrade Settings")]
+    public UpgradeType upgradeType;
+
+    [Header("Data (SO)")]
+    public EquipmentDataSO equipmentData;
+    public NPCDataSO npcData;
+
+    [Header("NPC Target Stacks")]
+    public MachineStackHandler sourceMachineStack;
+    public MachineStackHandler targetDeskStack;
+    public MachineStackHandler minerTargetStack;
+
     [Header("Progress")]
     public int currentCash = 0;
     private int requiredCash = -1;
-
     private float lastInteractTime;
     private float interactCooldown = 0.05f;
 
     [Header("UI Reference")]
     public TextMeshProUGUI priceText;
 
-    [Header("Upgrade Settings")]
-    public UpgradeType upgradeType;
-    public EquipmentDataSO equipmentData; // 장비용
-    public GameObject npcPrefab;          // NPC용
-    public int spawnCount = 3;            // 생성할 NPC 수
+    private AudioSource zoneAudioSource; // [추가] 발판 자체 사운드용
 
     private void Start()
     {
-        if (equipmentData != null)
-        {
-            requiredCash = equipmentData.price;
-        }
-
-        if (priceText == null)
-            priceText = GetComponentInChildren<TextMeshProUGUI>();
-
+        zoneAudioSource = GetComponent<AudioSource>(); // [추가]
+        InitializeUpgradeData();
+        if (priceText == null) priceText = GetComponentInChildren<TextMeshProUGUI>();
         UpdatePriceText();
     }
 
-    // [중요] PlayerInteraction에서 호출하는 인터페이스 함수
+    private void InitializeUpgradeData()
+    {
+        if (upgradeType == UpgradeType.Equipment)
+        {
+            if (equipmentData != null) requiredCash = equipmentData.price;
+        }
+        else
+        {
+            if (npcData != null) requiredCash = npcData.price;
+        }
+    }
+
     public void Interact(PlayerInteraction player)
     {
-        // 작동 여부 확인을 위해 디버그 로그 추가
-        // Debug.Log("[UpgradeZone] 플레이어와 접촉 중...");
-
         if (requiredCash <= 0 || currentCash >= requiredCash) return;
         if (Time.time - lastInteractTime < interactCooldown) return;
 
         lastInteractTime = Time.time;
 
-        // 1. 물리적 돈 소모
         if (player.playerStack.HasResourceType(ResourceType.Cash))
         {
             ResourceItem cashItem = player.playerStack.RemoveSpecificType(ResourceType.Cash);
             if (cashItem != null)
             {
+                // [추가] 자원 이동 사운드 (플레이어 위치)
+                player.PlayResourceMoveSound();
                 ConsumePhysicalResource(cashItem, player);
                 return;
             }
         }
 
-        // 2. 가상 재화 소모 (등에 돈이 없을 때)
-        int spendAmount = 5;
-        if (GameManager.Instance.SpendMoney(spendAmount))
+        if (GameManager.Instance.SpendMoney(5))
         {
-            currentCash += spendAmount;
+            currentCash += 5;
             UpdatePriceText();
             CheckUpgradeComplete(player);
         }
@@ -73,10 +84,8 @@ public class UpgradeZone : MonoBehaviour, IInteractable
     {
         item.JumpTo(transform, Vector3.zero, 0.2f, () =>
         {
-            int cashValue = 5;
-            GameManager.Instance.SpendMoney(cashValue);
-
-            currentCash += cashValue;
+            GameManager.Instance.SpendMoney(5);
+            currentCash += 5;
             UpdatePriceText();
             ObjectPool.Instance.Push(item.gameObject);
             CheckUpgradeComplete(player);
@@ -96,23 +105,62 @@ public class UpgradeZone : MonoBehaviour, IInteractable
     {
         if (currentCash >= requiredCash)
         {
+            // [수정] 구매 성공 사운드 (발판 위치)
+            AudioManager.Instance.Play3DSFX(zoneAudioSource, AudioManager.Instance.purchaseClip);
+
+            OnZoneCompleted?.Invoke(this);
+
             switch (upgradeType)
             {
                 case UpgradeType.Equipment:
-                    player.GetComponent<PlayerController>().ChangeEquipment(equipmentData);
+                    if (equipmentData != null) player.GetComponent<PlayerController>().ChangeEquipment(equipmentData);
                     break;
-
                 case UpgradeType.MinerNPC:
+                    SpawnMiners();
+                    break;
                 case UpgradeType.TransporterNPC:
-                    for (int i = 0; i < spawnCount; i++)
-                    {
-                        // 발판 앞에서 약간의 간격을 두고 생성
-                        Vector3 spawnPos = transform.position + transform.forward * 2f + new Vector3(i, 0, 0);
-                        Instantiate(npcPrefab, spawnPos, Quaternion.identity);
-                    }
+                    SpawnTransporters();
                     break;
             }
-            gameObject.SetActive(false); // 발판 제거
+            gameObject.SetActive(false);
+        }
+    }
+
+    private void SpawnMiners()
+    {
+        if (npcData == null || npcData.npcPrefab == null) return;
+
+        for (int i = 0; i < npcData.spawnCount; i++)
+        {
+            Vector3 spawnPos = transform.position + transform.forward * 2f + new Vector3(i * 0.7f, 0, 0);
+            GameObject npcObj = Instantiate(npcData.npcPrefab, spawnPos, Quaternion.identity);
+
+            MinerNPC miner = npcObj.GetComponent<MinerNPC>();
+            if (miner != null) miner.targetMachineInput = minerTargetStack;
+
+            NavMeshAgent agent = npcObj.GetComponent<NavMeshAgent>();
+            if (agent != null) agent.Warp(spawnPos);
+        }
+    }
+
+    private void SpawnTransporters()
+    {
+        if (npcData == null || npcData.npcPrefab == null) return;
+
+        for (int i = 0; i < npcData.spawnCount; i++)
+        {
+            Vector3 spawnPos = transform.position + transform.forward * 2f + new Vector3(i * 0.7f, 0, 0);
+            GameObject npcObj = Instantiate(npcData.npcPrefab, spawnPos, Quaternion.identity);
+
+            TransporterNPC transporter = npcObj.GetComponent<TransporterNPC>();
+            if (transporter != null)
+            {
+                transporter.sourceStack = sourceMachineStack;
+                transporter.targetStack = targetDeskStack;
+            }
+
+            NavMeshAgent agent = npcObj.GetComponent<NavMeshAgent>();
+            if (agent != null) agent.Warp(spawnPos);
         }
     }
 }

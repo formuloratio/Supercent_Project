@@ -6,15 +6,15 @@ using static GameEnums;
 public class BookingDesk : MonoBehaviour
 {
     [Header("Stacks")]
-    public MachineStackHandler inputStack;  // 수갑이 쌓이는 곳
-    public MachineStackHandler outputStack; // 돈이 쌓이는 곳
+    public MachineStackHandler inputStack;
+    public MachineStackHandler outputStack;
     public GameObject cashPrefab;
 
     [Header("Queue System")]
-    public Transform queueStartPoint;       // 업무 보는 위치
-    public Transform[] queuePoints;         // 대기 줄 위치들
-    public Transform jailEntrancePoint;     // 감옥 입구
-    public Transform spawnPoint;            // NPC 스폰 지점
+    public Transform queueStartPoint;
+    public Transform[] queuePoints;
+    public Transform jailEntrancePoint;
+    public Transform spawnPoint;
 
     [Header("Settings")]
     public GameObject npcPrefab;
@@ -22,17 +22,23 @@ public class BookingDesk : MonoBehaviour
     public CriminalDataSO criminalData;
 
     [Header("Door Object")]
-    public GameObject jailDoor;             // 감옥 문 오브젝트
-    private int travelingPrisonersCount = 0; // 현재 감옥으로 이동 중인 죄수 수
+    public GameObject jailDoor;
+    private int travelingPrisonersCount = 0;
 
     private List<CriminalNPC> waitingQueue = new List<CriminalNPC>();
     private CriminalNPC currentProcessingNPC;
 
     private bool isProcessing = false;
     private float spawnTimer;
-
     private float lastCollectTime;
     private bool isTransferring = false;
+
+    private AudioSource deskAudioSource;
+
+    private void Awake()
+    {
+        deskAudioSource = GetComponent<AudioSource>();
+    }
 
     private void Update()
     {
@@ -54,10 +60,8 @@ public class BookingDesk : MonoBehaviour
     private void SpawnNPC()
     {
         if (spawnPoint == null || npcPrefab == null) return;
-
         GameObject npcObj = ObjectPool.Instance.Pop(npcPrefab, spawnPoint.position, spawnPoint.rotation);
         CriminalNPC npc = npcObj.GetComponent<CriminalNPC>();
-
         waitingQueue.Add(npc);
     }
 
@@ -79,11 +83,8 @@ public class BookingDesk : MonoBehaviour
     private void CheckAndProcessCriminal()
     {
         if (isProcessing || currentProcessingNPC == null || criminalData == null) return;
-
-        // NPC가 업무 데스크 위치에 도착했는지 확인
         if (Vector3.Distance(currentProcessingNPC.transform.position, queueStartPoint.position) > 0.5f) return;
 
-        // 수갑이 충분하고 돈을 쌓을 공간이 있으면 시작
         if (outputStack.Count < 100 && inputStack.Count >= criminalData.requiredHandcuffs)
         {
             StartCoroutine(ConvertRoutine());
@@ -94,10 +95,10 @@ public class BookingDesk : MonoBehaviour
     {
         isProcessing = true;
 
-        // 1. 수갑 소모 연출
         int required = criminalData.requiredHandcuffs;
         for (int i = 0; i < required; i++)
         {
+            AudioManager.Instance.Play3DSFX(deskAudioSource, AudioManager.Instance.convertClip);
             ResourceItem handcuff = inputStack.RemoveFromStack();
             if (handcuff != null)
             {
@@ -110,11 +111,8 @@ public class BookingDesk : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.3f);
-
-        // 2. 죄수로 변환
         currentProcessingNPC.ChangeToPrisoner();
 
-        // 3. 보상(돈) 생성
         int reward = criminalData.rewardCash;
         for (int i = 0; i < reward; i++)
         {
@@ -124,32 +122,32 @@ public class BookingDesk : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
         }
 
-        // 4. 감옥으로 이동 및 문 제어
+        // [이동 로직]
         travelingPrisonersCount++;
-        if (jailDoor != null) jailDoor.SetActive(false); // 문 열림
+        if (jailDoor != null) jailDoor.SetActive(false);
 
-        Vector3 randomOffset = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+        // --- 핵심: 가로막힘과 상관없이 출발하는 순간 즉시 카운트 ---
+        GameManager.Instance.AddPrisoner();
 
-        StartCoroutine(currentProcessingNPC.GoToJail(jailEntrancePoint.position + randomOffset, () =>
+        Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), 0, Random.Range(-0.5f, 0.5f));
+        CriminalNPC npcToJail = currentProcessingNPC;
+
+        StartCoroutine(npcToJail.GoToJail(jailEntrancePoint.position + randomOffset, () =>
         {
-            // 감옥 도착 시 콜백
+            // 도착 시 문 닫기 체크만 수행 (카운트는 이미 올라감)
             travelingPrisonersCount--;
-
-            // 이동 중인 죄수가 더 이상 없으면 문 닫기
             if (travelingPrisonersCount <= 0)
             {
                 travelingPrisonersCount = 0;
-                if (jailDoor != null) jailDoor.SetActive(true); // 문 닫힘
+                if (jailDoor != null) jailDoor.SetActive(true);
             }
         }));
 
         yield return new WaitForSeconds(0.5f);
-
         currentProcessingNPC = null;
         isProcessing = false;
     }
 
-    // --- 상호작용: 플레이어가 수갑을 줄 때 ---
     public void Deposit(PlayerInteraction player)
     {
         if (isTransferring) return;
@@ -172,34 +170,29 @@ public class BookingDesk : MonoBehaviour
         isTransferring = false;
     }
 
-    // --- 상호작용: 플레이어가 돈을 수거할 때 ---
     public void Collect(PlayerInteraction player)
     {
         if (Time.time - lastCollectTime < 0.05f) return;
-
         if (outputStack.Count > 0)
         {
             lastCollectTime = Time.time;
             ResourceItem item = outputStack.RemoveFromStack();
-
             if (item != null)
             {
                 if (item.type == ResourceType.Cash)
                 {
-                    int cashValue = 5; // [규칙] 돈 한 장의 가치는 5원
-
+                    int cashValue = 5;
                     if (player.playerStack.CanAdd(ResourceType.Cash))
                     {
-                        // 1. 가방에 담기
                         player.playerStack.AddToStack(item, 0);
-                        // 2. 지갑(UI)에 즉시 반영
                         GameManager.Instance.AddMoney(cashValue);
+                        player.PlayCashPickupSound();
                     }
                     else
                     {
-                        // 가방이 꽉 찼을 때 먹으면 바로 돈으로 환산 연출
                         item.JumpTo(player.transform, Vector3.up * 2f, 0.2f, () => {
                             GameManager.Instance.AddMoney(cashValue);
+                            player.PlayCashPickupSound();
                             ObjectPool.Instance.Push(item.gameObject);
                         });
                     }
@@ -210,7 +203,6 @@ public class BookingDesk : MonoBehaviour
                 }
                 else
                 {
-                    // 가방에 못 담으면 다시 스택에 돌려놓음
                     outputStack.AddToStack(item, 100);
                 }
             }

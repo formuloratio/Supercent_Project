@@ -11,17 +11,17 @@ public class IronStone : MonoBehaviour, IMineable
     [Header("Settings")]
     public float respawnDelay = 5f;
 
-    // 컴포넌트 참조
     private Renderer rockRenderer;
     private Collider rockCollider;
+    private AudioSource rockAudioSource; // [추가] 3D 사운드 발생기
 
     public bool IsActive => currentHealth > 0;
 
     private void Awake()
     {
-        // 자기 자신에게 붙은 컴포넌트들을 가져옴
         rockRenderer = GetComponent<Renderer>();
         rockCollider = GetComponent<Collider>();
+        rockAudioSource = GetComponent<AudioSource>(); // [추가]
     }
 
     private void OnEnable()
@@ -29,18 +29,20 @@ public class IronStone : MonoBehaviour, IMineable
         ResetRock();
     }
 
-    public void TakeDamage(int damage, Vector3 hitPoint)
+    public bool TakeDamage(int damage, Vector3 hitPoint)
     {
-        if (!IsActive) return;
+        if (!IsActive) return false;
 
         currentHealth -= damage;
         PlayHitFeedback();
 
         if (currentHealth <= 0)
         {
-            // [핵심] 오브젝트를 끄지 않고, 모습만 감추는 코루틴 실행
             StartCoroutine(DieAndRespawnRoutine());
+            return true;
         }
+
+        return false;
     }
 
     private void PlayHitFeedback()
@@ -58,13 +60,8 @@ public class IronStone : MonoBehaviour, IMineable
 
     private IEnumerator DieAndRespawnRoutine()
     {
-        // 1. "사라짐" 처리: 메쉬와 콜라이더만 비활성화
         SetAppearance(false);
-
-        // 2. 5초 대기 (스크립트가 살아있으므로 정상 작동)
         yield return new WaitForSeconds(respawnDelay);
-
-        // 3. "다시 나타남" 처리
         ResetRock();
     }
 
@@ -77,11 +74,7 @@ public class IronStone : MonoBehaviour, IMineable
 
     private void SetAppearance(bool visible)
     {
-        // 자기 자신의 렌더러와 콜라이더를 켜고 끔
         if (rockRenderer != null) rockRenderer.enabled = visible;
         if (rockCollider != null) rockCollider.enabled = visible;
-
-        // 만약 자식 오브젝트에도 메쉬가 있다면 아래 코드 추가 (선택 사항)
-        // foreach (var r in GetComponentsInChildren<Renderer>()) r.enabled = visible;
     }
 }

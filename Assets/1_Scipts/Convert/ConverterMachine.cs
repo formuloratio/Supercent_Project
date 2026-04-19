@@ -21,9 +21,17 @@ public class ConverterMachine : MonoBehaviour
     private bool isTransferring = false;
 
     private float lastCollectTime;
-    public float collectInterval = 0.05f; // 수거 간격 (초당 최대 20개)
+    public float collectInterval = 0.05f; // 수거 간격
 
-    // 기계 전체에서 Update는 여기서 '딱 한 번'만 실행됨
+    // [추가] 기계 자체 사운드 재생을 위한 컴포넌트
+    private AudioSource machineAudioSource;
+
+    private void Awake()
+    {
+        // 기계 위치에서 소리를 내기 위해 AudioSource 참조
+        machineAudioSource = GetComponent<AudioSource>();
+    }
+
     private void Update()
     {
         if (inputStack.Count > 0 && outputStack.Count < 100)
@@ -41,7 +49,13 @@ public class ConverterMachine : MonoBehaviour
         ResourceItem consumedItem = inputStack.RemoveFromStack();
         if (consumedItem == null) return;
 
-        //모든 자원을 오브젝트 풀로 반납합니다.
+        // [사운드] 자원이 기계 안에서 변환될 때 재생 (기계 위치)
+        if (machineAudioSource != null)
+        {
+            AudioManager.Instance.Play3DSFX(machineAudioSource, AudioManager.Instance.convertClip);
+        }
+
+        // 모든 자원을 오브젝트 풀로 반납합니다.
         ObjectPool.Instance.Push(consumedItem.gameObject);
 
         // 결과물 생성
@@ -64,14 +78,15 @@ public class ConverterMachine : MonoBehaviour
     {
         isTransferring = true;
 
-        // [문제 1 해결] 가방 안에 기계가 원하는 inputType이 하나라도 있는 동안 계속 실행
         while (player.playerStack.HasResourceType(inputType))
         {
-            // 특정 타입만 골라서 가져옴 (다른 자원이 가로막고 있어도 상관없음)
             ResourceItem item = player.playerStack.RemoveSpecificType(inputType);
 
             if (item != null)
             {
+                // [사운드] 자원이 플레이어 등에서 빠져나갈 때 재생 (플레이어 위치)
+                player.PlayResourceMoveSound();
+
                 inputStack.AddToStack(item, 100);
                 yield return new WaitForSeconds(transferInterval);
             }
@@ -91,16 +106,17 @@ public class ConverterMachine : MonoBehaviour
 
             if (item != null)
             {
+                // [사운드] 자원이 플레이어에게 들어올 때 재생 (플레이어 위치)
+                player.PlayResourceMoveSound();
+
                 if (item.type == ResourceType.Cash)
                 {
                     if (player.playerStack.CanAdd(ResourceType.Cash))
                     {
-                        // 등에 쌓음 (이때 PlayerStackHandler 내부에서 UI를 업데이트함)
                         player.playerStack.AddToStack(item, 0);
                     }
                     else
                     {
-                        // 가방이 꽉 찼을 때: 등에 쌓지는 않지만 돈은 벌림
                         item.JumpTo(player.transform, Vector3.up * 2f, 0.2f, () => {
                             GameManager.Instance.AddMoney(10);
                             ObjectPool.Instance.Push(item.gameObject);
@@ -113,7 +129,6 @@ public class ConverterMachine : MonoBehaviour
                 }
                 else
                 {
-                    // 다른 자원은 자리 없으면 다시 기계로
                     outputStack.AddToStack(item, 100);
                 }
             }

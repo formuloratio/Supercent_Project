@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b09c3d68f6b9845becd031bb1a51ce, type: 3}
+  m_Name: MinerNPCData
+  m_EditorClassIdentifier: 
+  npcName: Miner
+  price: 50
+  npcPrefab: {fileID: 4251116072115442353, guid: 9c72f05b251ca3d49bfe3d97b60937ba,
+    type: 3}
+  spawnCount: 3
