@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a08eb4a9944964e41a76f2c8df564c21, type: 3}
   m_Name: 1_PickaxeData
   m_EditorClassIdentifier: 
-  type: 0
+  itemName: Pickaxe
   visualPrefab: {fileID: 3537638552798542410, guid: c65bbe6a3fcb031429a8e88c3ee108a0,
     type: 3}
-  maxCapacity: 10
-  mineCooldown: 0.5
+  targetPivotIndex: 0
+  isDrillType: 0
   mineDamage: 100
-  moveSpeed: 5
-  animatorOverride: {fileID: 9100000, guid: fbc71faf548b3b44288b27783abe4791, type: 2}
+  mineCooldown: 0.5
+  maxCapacity: 10

@@ -1,70 +1,118 @@
-﻿using UnityEngine;
-using UnityEngine.Events;
+﻿using TMPro;
+using UnityEngine;
 using static GameEnums;
-using static Interfaces;
+using static Interfaces; // IInteractable이 정의된 네임스페이스 (필요시 확인)
 
+public enum UpgradeType { Equipment, MinerNPC, TransporterNPC }
+
+// [핵심] IInteractable을 반드시 상속받아야 Player가 인식합니다!
 public class UpgradeZone : MonoBehaviour, IInteractable
 {
-    [Header("Settings")]
-    public int requiredCash = 100;
+    [Header("Progress")]
     public int currentCash = 0;
-    public ResourceType payResourceType = ResourceType.Cash;
+    private int requiredCash = -1;
 
-    [Header("Events")]
-    public UnityEvent onUpgradeComplete; // 업그레이드 완료 시 실행할 이벤트
-
-    [Header("Interaction")]
-    public float interactCooldown = 0.1f; // 돈이 빠져나가는 간격
     private float lastInteractTime;
+    private float interactCooldown = 0.05f;
 
+    [Header("UI Reference")]
+    public TextMeshProUGUI priceText;
+
+    [Header("Upgrade Settings")]
+    public UpgradeType upgradeType;
+    public EquipmentDataSO equipmentData; // 장비용
+    public GameObject npcPrefab;          // NPC용
+    public int spawnCount = 3;            // 생성할 NPC 수
+
+    private void Start()
+    {
+        if (equipmentData != null)
+        {
+            requiredCash = equipmentData.price;
+        }
+
+        if (priceText == null)
+            priceText = GetComponentInChildren<TextMeshProUGUI>();
+
+        UpdatePriceText();
+    }
+
+    // [중요] PlayerInteraction에서 호출하는 인터페이스 함수
     public void Interact(PlayerInteraction player)
     {
-        if (currentCash >= requiredCash) return;
+        // 작동 여부 확인을 위해 디버그 로그 추가
+        // Debug.Log("[UpgradeZone] 플레이어와 접촉 중...");
+
+        if (requiredCash <= 0 || currentCash >= requiredCash) return;
         if (Time.time - lastInteractTime < interactCooldown) return;
 
         lastInteractTime = Time.time;
 
-        // 1. 우선 플레이어 등에 있는 물리적 돈부터 소모 (시각적 재미)
+        // 1. 물리적 돈 소모
         if (player.playerStack.HasResourceType(ResourceType.Cash))
         {
             ResourceItem cashItem = player.playerStack.RemoveSpecificType(ResourceType.Cash);
             if (cashItem != null)
             {
-                ConsumeResource(cashItem);
+                ConsumePhysicalResource(cashItem, player);
                 return;
             }
         }
 
-        // 2. 등에 돈이 없다면 가상 재화(GameManager)에서 직접 소모
-        if (GameManager.Instance.CurrentMoney >= 10) // 최소 단위가 10원일 때
+        // 2. 가상 재화 소모 (등에 돈이 없을 때)
+        int spendAmount = 5;
+        if (GameManager.Instance.SpendMoney(spendAmount))
         {
-            if (GameManager.Instance.SpendMoney(10))
-            {
-                currentCash += 10;
-                // (선택) 가상 재화가 소모될 때도 돈 입자가 날아가는 UI 연출 등을 넣으면 좋음
-                //CheckUpgradeComplete();
-            }
+            currentCash += spendAmount;
+            UpdatePriceText();
+            CheckUpgradeComplete(player);
         }
     }
 
-    private void ConsumeResource(ResourceItem item)
+    private void ConsumePhysicalResource(ResourceItem item, PlayerInteraction player)
     {
-        // 돈이 구역 중앙으로 빨려 들어가는 연출 (0.2초)
         item.JumpTo(transform, Vector3.zero, 0.2f, () =>
         {
-            // 돈의 가치만큼 현재 금액 추가 (예: 개당 10원)
-            // ResourceItem에 value 변수가 있다면 item.value를 사용하세요.
-            currentCash += 1;
+            int cashValue = 5;
+            GameManager.Instance.SpendMoney(cashValue);
 
-            // 연출이 끝난 오브젝트는 파괴 (돈은 풀링 안 하기로 함)
+            currentCash += cashValue;
+            UpdatePriceText();
             ObjectPool.Instance.Push(item.gameObject);
-
-            // 완료 체크
-            if (currentCash >= requiredCash)
-            {
-                onUpgradeComplete?.Invoke();
-                gameObject.SetActive(false); // 구역 비활성화
-            }
+            CheckUpgradeComplete(player);
         });
+    }
+
+    private void UpdatePriceText()
+    {
+        if (priceText != null)
+        {
+            int remaining = requiredCash - currentCash;
+            priceText.text = remaining > 0 ? remaining.ToString() : "0";
+        }
+    }
+
+    private void CheckUpgradeComplete(PlayerInteraction player)
+    {
+        if (currentCash >= requiredCash)
+        {
+            switch (upgradeType)
+            {
+                case UpgradeType.Equipment:
+                    player.GetComponent<PlayerController>().ChangeEquipment(equipmentData);
+                    break;
+
+                case UpgradeType.MinerNPC:
+                case UpgradeType.TransporterNPC:
+                    for (int i = 0; i < spawnCount; i++)
+                    {
+                        // 발판 앞에서 약간의 간격을 두고 생성
+                        Vector3 spawnPos = transform.position + transform.forward * 2f + new Vector3(i, 0, 0);
+                        Instantiate(npcPrefab, spawnPos, Quaternion.identity);
+                    }
+                    break;
+            }
+            gameObject.SetActive(false); // 발판 제거
+        }
     }
 }

@@ -13,6 +13,7 @@ public class PlayerStackHandler : MonoBehaviour
     public int maxIronOre = 20;   // 철광석 최대치
     public int maxCash = 20;      // 돈 최대치
     public int maxHandcuff = 20;  // 수갑 최대치
+    public int maxCapacity = 10;
 
     [Header("Settings")]
     [SerializeField] private float stepHeight = 0.2f;
@@ -40,7 +41,14 @@ public class PlayerStackHandler : MonoBehaviour
         return current;
     }
 
-    // [수정] 타입별로 독립된 최대 용량과 비교합니다.
+    // [추가] 장비에 따라 철광석 최대 수용량을 업데이트하는 함수
+    public void SetMiningCapacity(int newCapacity)
+    {
+        maxIronOre = newCapacity;
+        Debug.Log($"철광석 최대 용량 변경됨: {maxIronOre}");
+    }
+
+    // CanAdd 로직은 그대로 유지 (이미 maxIronOre를 보고 있으므로 변수값만 바뀌면 정상 작동함)
     public bool CanAdd(ResourceType type)
     {
         int current = GetCurrentCountByType(type);

@@ -2,13 +2,13 @@
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement Settings")]
+    public float moveSpeed = 5.0f; // 장비와 상관없이 플레이어의 기본 이동 속도
     public FloatingJoystick joystick;
     public Animator animator;
-    public Transform equipmentPivot; // 장비가 붙을 위치
+    public Transform equipmentPivot;
 
     private EquipmentDataSO currentEquipment;
-    private GameObject currentVisual;
-
     private readonly int isMovingHash = Animator.StringToHash("isMoving");
     private Camera mainCam;
 
@@ -30,12 +30,12 @@ public class PlayerController : MonoBehaviour
         forward.Normalize(); right.Normalize();
 
         Vector3 direction = (forward * joystick.Vertical) + (right * joystick.Horizontal);
-        float speed = currentEquipment != null ? currentEquipment.moveSpeed : 5f;
 
+        // [수정] 장비 데이터(SO)를 참조하지 않고, 이 스크립트의 moveSpeed를 바로 사용합니다.
         if (direction.magnitude > 0.1f)
         {
-            transform.position += direction * speed * Time.deltaTime;
-            transform.forward = Vector3.Slerp(transform.forward, direction, Time.deltaTime * 10f); // 부드러운 회전
+            transform.position += direction * moveSpeed * Time.deltaTime;
+            transform.forward = Vector3.Slerp(transform.forward, direction, Time.deltaTime * 10f);
             animator.SetBool(isMovingHash, true);
         }
         else
@@ -46,24 +46,18 @@ public class PlayerController : MonoBehaviour
 
     public void ChangeEquipment(EquipmentDataSO newData)
     {
-        currentEquipment = newData;
-
-        // 기존 비주얼 제거
-        if (currentVisual != null) Destroy(currentVisual);
-
-        // 새 비주얼 생성
-        if (newData.visualPrefab != null)
+        // 1. 비주얼 담당에게 명령
+        var handler = GetComponent<PlayerEquipmentHandler>();
+        if (handler != null)
         {
-            currentVisual = Instantiate(newData.visualPrefab, equipmentPivot);
+            handler.ChangeVisual(newData.visualPrefab, newData.targetPivotIndex);
         }
 
-        // 애니메이션 오버라이드 (차량 탑승 등)
-        if (newData.animatorOverride != null)
+        // 2. 데이터 담당에게 명령
+        var interaction = GetComponent<PlayerInteraction>();
+        if (interaction != null)
         {
-            animator.runtimeAnimatorController = newData.animatorOverride;
+            interaction.UpdateEquipmentData(newData);
         }
-
-        // 데이터 동기화
-        GetComponent<PlayerInteraction>().UpdateEquipmentData(newData);
     }
 }

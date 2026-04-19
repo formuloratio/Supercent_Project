@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a08eb4a9944964e41a76f2c8df564c21, type: 3}
   m_Name: 1_DrillData
   m_EditorClassIdentifier: 
-  type: 1
+  itemName: Drill
   visualPrefab: {fileID: 3153938805344183868, guid: 75a259a7cfa8a604aa58e2dd236f9956,
     type: 3}
-  maxCapacity: 1
-  mineCooldown: 0.05
+  targetPivotIndex: 1
+  isDrillType: 1
+  price: 20
   mineDamage: 100
-  moveSpeed: 8
-  animatorOverride: {fileID: 9100000, guid: fbc71faf548b3b44288b27783abe4791, type: 2}
+  maxCapacity: 15

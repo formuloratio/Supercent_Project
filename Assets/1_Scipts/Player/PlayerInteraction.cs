@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using static GameEnums;
 using static Interfaces;
@@ -6,107 +7,144 @@ using static Interfaces;
 public class PlayerInteraction : MonoBehaviour
 {
     public PlayerStackHandler playerStack;
-    public GameObject orePrefab; // 임시 채굴용 프리팹 (보통 돌에서 생성)
+    public GameObject orePrefab;
 
     [Header("UI Feedback")]
-    public GameObject maxTextPrefab; // "MAX"라고 적힌 팝업 UI 혹은 프리팹
+    public GameObject maxTextPrefab;
 
     public EquipmentDataSO currentEqData;
 
-    private float lastMineTime;
     private IMineable currentTargetRock;
-    private bool isMining = false; // 채굴 상태
+    private bool isMining = false; // 이 플래그가 false가 되는 순간 다음 채굴 시작
 
-    // 문자열 대신 해시값을 사용하여 성능 최적화
     private readonly int doMiningHash = Animator.StringToHash("doMining");
+    private readonly int doDrillingHash = Animator.StringToHash("doDrilling");
 
     public void UpdateEquipmentData(EquipmentDataSO data)
     {
         currentEqData = data;
+
+        if (playerStack != null)
+        {
+            // 1. 철광석 수용량 갱신
+            playerStack.maxIronOre = data.maxCapacity;
+
+            // 2. 돈 수용량 갱신 (철광석과 동일하게 늘리거나, 별도 비율을 줄 수도 있습니다)
+            playerStack.maxCash = data.maxCapacity;
+        }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        // 1. 채굴
         if (other.CompareTag("IronStone"))
         {
             currentTargetRock = other.GetComponent<IMineable>();
 
-            if (!isMining)
+            if (currentTargetRock != null && currentTargetRock.IsActive)
             {
-                if (currentTargetRock != null && currentTargetRock.IsActive)
+                // [수정] 시간 제한(lastMineTime) 없이 애니메이션만 끝났다면 바로 채굴
+                if (!isMining)
                 {
-                    if (Time.time - lastMineTime >= currentEqData.mineCooldown)
-                    {
-                        PerformMining();
-                    }
+                    PerformMining();
                 }
             }
         }
 
-        // 2. 기계 및 구역 상호작용
         if (other.TryGetComponent<IInteractable>(out var interactable))
         {
             interactable.Interact(this);
         }
     }
 
-    // 수정된 PerformMining 함수 (애니메이션만 실행)
     private void PerformMining()
     {
-        // [수정] 전체 개수가 아니라 "철광석" 자리가 있는지 확인합니다.
-        //if (!playerStack.CanAdd(ResourceType.IronOre)) return;
-
         isMining = true;
-        lastMineTime = Time.time;
-        GetComponent<Animator>().SetTrigger(doMiningHash);
+
+        Animator anim = GetComponent<Animator>();
+
+        if (currentEqData != null && currentEqData.isDrillType)
+        {
+            anim.SetTrigger(doDrillingHash);
+        }
+        else
+        {
+            anim.SetTrigger(doMiningHash);
+        }
     }
 
-    // 1. 애니메이션 이벤트 수신: 곡괭이가 돌을 내리찍는 정확한 순간에 호출됨
     public void OnMiningImpact()
     {
-        if (currentTargetRock != null && currentTargetRock.IsActive)
+        // --- 드릴/불도저 타입 (다중 센서 대응) ---
+        if (currentEqData != null && currentEqData.isDrillType)
         {
-            // [핵심] 여기서 가방이 꽉 찼는지 확인합니다.
-            if (!playerStack.CanAdd(ResourceType.IronOre))
+            // 1. 모든 자식에서 DrillHead 컴포넌트들을 다 가져옵니다.
+            DrillHead[] allDrillHeads = GetComponentsInChildren<DrillHead>();
+
+            if (allDrillHeads.Length > 0)
             {
-                // 가방이 꽉 찼을 때: MAX 표시만 띄움
-                ShowMaxFeedback(((Component)currentTargetRock).transform.position + Vector3.up * 2f);
+                // 2. 중복 타격 방지를 위해 HashSet 사용 (여러 드릴이 한 바위 칠 때 대비)
+                HashSet<IMineable> uniqueRocks = new HashSet<IMineable>();
+
+                foreach (var head in allDrillHeads)
+                {
+                    head.CleanUpList(); // 죽은 바위 정리
+                    foreach (var rock in head.touchingRocks)
+                    {
+                        uniqueRocks.Add(rock); // 중복되지 않게 담기
+                    }
+                }
+
+                // 3. 수집된 모든 고유 광석들 채굴 처리
+                foreach (var rock in uniqueRocks)
+                {
+                    ProcessMining(rock);
+                }
                 return;
             }
+        }
 
-            // 가방에 자리가 있을 때만: 실제 채굴 로직 실행
-            currentTargetRock.TakeDamage(currentEqData.mineDamage, ((Component)currentTargetRock).transform.position);
+        // --- 일반 곡괭이 타입 (단일 채굴) ---
+        if (currentTargetRock != null && currentTargetRock.IsActive)
+        {
+            ProcessMining(currentTargetRock);
+        }
+    }
 
-            GameObject oreObj = ObjectPool.Instance.Pop(orePrefab, ((Component)currentTargetRock).transform.position, Quaternion.identity);
-            ResourceItem item = oreObj.GetComponent<ResourceItem>();
+    // 실제 채굴 로직을 별도 함수로 분리 (중복 방지)
+    private void ProcessMining(IMineable target)
+    {
+        if (target == null || !target.IsActive) return;
 
-            if (item != null)
-            {
-                playerStack.AddToStack(item, currentEqData.maxCapacity);
-            }
+        // 가방 체크
+        if (!playerStack.CanAdd(ResourceType.IronOre))
+        {
+            ShowMaxFeedback(((Component)target).transform.position + Vector3.up * 2f);
+            return;
+        }
+
+        // 데미지 및 보상 생성
+        target.TakeDamage(currentEqData.mineDamage, ((Component)target).transform.position);
+
+        GameObject oreObj = ObjectPool.Instance.Pop(orePrefab, ((Component)target).transform.position, Quaternion.identity);
+        ResourceItem item = oreObj.GetComponent<ResourceItem>();
+
+        if (item != null)
+        {
+            playerStack.AddToStack(item, currentEqData.maxCapacity);
         }
     }
 
     private void ShowMaxFeedback(Vector3 position)
     {
-        // 방법 1: 간단하게 로그만 찍거나
-        // Debug.Log("가방이 가득 찼습니다!");
-
-        // 방법 2: MAX 프리팹을 띄우는 로직 (추천)
         if (maxTextPrefab != null)
         {
-            // ObjectPool을 사용하여 MAX 표시 오브젝트를 팝업
             ObjectPool.Instance.Pop(maxTextPrefab, position, Quaternion.identity);
-
-            // 일정 시간 후 다시 풀에 넣는 로직이 포함된 스크립트가 maxPop에 있으면 좋습니다.
         }
     }
 
-    // 2. 애니메이션 이벤트 수신: 채굴 모션이 끝날 때 호출됨
+    // 애니메이션 이벤트: 채굴 동작이 완전히 끝났을 때 호출
     public void FinishMining()
     {
         isMining = false;
-        currentTargetRock = null;
     }
 }
